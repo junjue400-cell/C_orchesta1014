@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>C语言第二章项目式学习大纲原型</title>
+  <style>
+:root{font-family:"Microsoft YaHei",system-ui,sans-serif;color:#183044;background:#f5f8fb}*{box-sizing:border-box}body{margin:0}.page{max-width:1380px;margin:auto;padding:28px 24px 48px}header{margin-bottom:24px}h1{font-size:30px;margin:5px 0 8px}h2{font-size:20px;margin:0 0 16px}h3{font-size:17px;margin:0 0 10px}p{line-height:1.7}.eyebrow{color:#17658b;font-weight:700;margin:0}.layout{display:grid;grid-template-columns:minmax(280px,340px) minmax(0,1fr);gap:20px;align-items:start}.panel{background:white;border:1px solid #d9e4ed;border-radius:14px;padding:22px;box-shadow:0 4px 20px #1b3d5710}.form-panel{display:grid;gap:15px}.form-panel label{display:grid;gap:7px;font-weight:600;font-size:14px}input,textarea{font:inherit;color:inherit;border:1px solid #b9ccda;border-radius:8px;padding:10px 12px;width:100%;resize:vertical;background:white}input:focus,textarea:focus{outline:2px solid #7cc8e1;outline-offset:1px}.hint{font-size:13px;color:#647989;margin:0}button{font:inherit;border:0;border-radius:8px;padding:10px 16px;background:#0b6590;color:white;font-weight:700;cursor:pointer}button:hover{background:#074f72}button.secondary{background:#e5f1f6;color:#0b567b}button.secondary:hover{background:#d5eaf2}button:disabled{opacity:.6;cursor:wait}.result-panel section{border-top:1px solid #e2eaf0;margin-top:20px;padding-top:19px}.result-panel section:first-of-type{border-top:0;margin-top:0;padding-top:0}.meta{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.chip{background:#e6f4f7;color:#116382;padding:5px 9px;border-radius:999px;font-size:12px}.callout{background:#f4f9fc;border-left:4px solid #3192b9;padding:10px 14px;margin:12px 0}.warning{background:#fff6e5;border-left-color:#df9726}.pass{color:#176a4a}.fail{color:#ad4a32}.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.stage{border:1px solid #dce7ee;border-radius:10px;padding:15px;margin:12px 0;background:#fbfdfe}.stage p{margin:7px 0}.small{font-size:13px;color:#5d7485}.editable{margin:8px 0} .editable label{font-size:13px;font-weight:600;display:block;margin-bottom:5px}.editable textarea,.editable input{background:#fff}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:680px}th,td{text-align:left;vertical-align:top;border-bottom:1px solid #e1e9ef;padding:12px 10px;line-height:1.55;font-size:14px}th{background:#f0f6fa;color:#27495c}.list{margin:6px 0;padding-left:20px}.list li{margin:4px 0}.status{font-size:14px;font-weight:600}footer{margin-top:24px;color:#647989;font-size:13px}@media(max-width:860px){.layout{grid-template-columns:1fr}.page{padding:18px 12px}h1{font-size:24px}}
+
+</style>
+  
+</head>
+<body>
+  <main class="page">
+    <header>
+      <p class="eyebrow">《C语言程序设计》 · 第二章：基本数据类型</p>
+      <h1>项目式学习大纲生成</h1>
+      <p>填写项目需求，生成阶段任务与“目标—活动—证据”对应表。可直接修改结果，重新校验后保存。</p>
+    </header>
+    <section class="layout" aria-label="大纲生成区">
+      <form id="requestForm" class="panel form-panel">
+        <h2>学生需求</h2>
+        <label>项目主题 <input name="theme" maxlength="80" required value="校园活动" placeholder="例如：社团招新"></label>
+        <label>信息使用者 <input name="audience" maxlength="80" required value="活动参与者" placeholder="例如：新生"></label>
+        <label>想解决的问题 <textarea name="need" maxlength="400" required rows="3">活动时间和地点经常变化，希望信息卡更容易更新。</textarea></label>
+        <label>希望呈现的字段 <input name="fields" maxlength="240" value="活动日期、地点、人数" placeholder="如：日期、地点、名额"></label>
+        <label>其他限制 <textarea name="limit" maxlength="200" rows="2" placeholder="可留空"></textarea></label>
+        <p class="hint">本章通过修改代码中的赋值更新数据；键盘输入、数组和文件保存属于后续章节。</p>
+        <button type="submit" id="generateButton">生成第二章大纲</button>
+      </form>
+      <div id="result" class="panel result-panel" aria-live="polite">
+        <h2>等待生成</h2>
+        <p>右侧会显示项目任务、阶段成果与对齐检查。</p>
+      </div>
+    </section>
+    <footer>本原型读取第二章图谱修订草案。生成的是学习与证据计划，尚未评价真实学生的掌握情况。</footer>
+  </main>
+<script>
+function cleanInput(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('需求格式不正确');
+  const pick = (key, max) => typeof raw[key] === 'string' ? raw[key].trim().slice(0, max) : '';
+  const input = {
+    theme: pick('theme', 80),
+    audience: pick('audience', 80),
+    fields: pick('fields', 240),
+    need: pick('need', 400),
+    limit: pick('limit', 200),
+  };
+  if (!input.theme || !input.audience || !input.need) {
+    throw new Error('请填写项目主题、使用者和需要解决的问题');
+  }
+  return input;
+}
+
+function generateOutline(raw, curriculum) {
+  const input = cleanInput(raw);
+  if (curriculum.chapter.id !== 'CH02') throw new Error('当前原型仅支持第二章');
+  const theme = input.theme;
+  const audience = input.audience;
+  const fieldText = input.fields || '活动日期、地点、人数等受众关心的信息';
+  const activityTexts = [
+    `围绕“${input.need}”与${audience}确认${theme}信息卡需要呈现的字段、单位和可能变化的数据；形成字段草稿，并区分固定说明与需要更新的值。`,
+    `在已有欢迎程序上增加${theme}信息卡：为必要数据选择基本类型，声明并初始化变量，输出字段与单位；通过修改代码中的赋值更新信息，预测并核对结果；用 sizeof 做简短的存储空间观察。`,
+    `向${audience}展示可运行的信息卡，记录实际反馈，修改代码中的值或呈现方式并复测；说明类型选择和赋值变化，必要时完成一个未直接示范的小型独立修改。`,
+  ];
+  const stages = curriculum.activities.map((activity, index) => ({
+    id: activity.id,
+    title: activity.name,
+    studentAction: activityTexts[index],
+    goalIds: activity.goal_ids,
+    artifacts: activity.artifacts,
+    choices: activity.learner_choices,
+  }));
+  const alignment = curriculum.goals.map((goal) => {
+    const evidence = curriculum.evidence.find((item) => item.id === goal.evidence_id);
+    return {
+      goalId: goal.id,
+      goal: goal.title,
+      knowledgeIds: goal.knowledge_ids,
+      capabilityIds: goal.capability_ids,
+      activityIds: goal.activity_ids,
+      evidenceId: evidence.id,
+      evidencePlan: evidence.acceptable_forms,
+      criteria: evidence.criteria,
+      independentRequired: goal.independent_evidence_required,
+      scopeNote: goal.scope_note,
+    };
+  });
+  const warnings = [];
+  if (/(scanf|键盘输入|运行时输入|从键盘|交互输入)/i.test(`${input.need} ${input.limit}`)) {
+    warnings.push('需求涉及键盘输入（教材第4章）。第二章先通过修改代码中的赋值更新信息，交互输入可列为后续扩展。');
+  }
+  if (/(排序|查找|数组|字符串处理|文件保存|数据库)/i.test(`${input.need} ${input.limit}`)) {
+    warnings.push('需求中含后续章节能力。当前大纲只覆盖第二章基本数据类型，相关功能暂列后续扩展。');
+  }
+  const outline = {
+    schemaVersion: '0.1',
+    sourceStatus: curriculum.sourceStatus,
+    chapter: curriculum.chapter,
+    request: input,
+    project: {
+      title: `${theme}：可更新的信息卡`,
+      drivingQuestion: `怎样用 C 语言准确表示${audience}关心的${theme}信息，并在需求变化时可靠更新？`,
+      audience,
+      fieldSuggestion: fieldText,
+      version: curriculum.project.artifact_version,
+      deliverables: curriculum.project.deliverables,
+      constraints: [...curriculum.project.constraints, ...(input.limit ? [`学生提出的限制：${input.limit}`] : [])],
+      continuation: '可作为第一章欢迎程序的下一版本，也可从同等起点开始。',
+    },
+    stages,
+    alignment,
+    warnings,
+    note: '这是预设的学习机会与证据获取计划，并非已经收集到的学生表现或掌握结论。',
+  };
+  outline.validation = validateOutline(outline, curriculum);
+  return outline;
+}
+
+function validateOutline(outline, curriculum) {
+  const issues = [];
+  if (!outline || typeof outline !== 'object' || !Array.isArray(outline.stages) || !Array.isArray(outline.alignment)) {
+    return { passed: false, issues: ['大纲结构不正确'], checkedAt: new Date().toISOString() };
+  }
+  const goalIds = new Set(curriculum.goals.map((item) => item.id));
+  const activityIds = new Set(outline.stages.map((item) => item.id));
+  const evidenceIds = new Set(curriculum.evidence.map((item) => item.id));
+  for (const goalId of goalIds) {
+    const row = outline.alignment.find((item) => item.goalId === goalId);
+    if (!row) { issues.push(`${goalId} 缺少对齐行`); continue; }
+    if (!row.activityIds?.length || row.activityIds.some((id) => !activityIds.has(id))) issues.push(`${goalId} 缺少有效学习活动`);
+    if (row.activityIds?.some((id) => !outline.stages.find((stage) => stage.id === id)?.goalIds?.includes(goalId))) {
+      issues.push(`${goalId} 与关联活动的目标标记不一致`);
+    }
+    if (!evidenceIds.has(row.evidenceId) || !row.evidencePlan?.length) issues.push(`${goalId} 缺少有效证据计划`);
+    if (!row.criteria?.length) issues.push(`${goalId} 缺少判断标准`);
+  }
+  for (const stage of outline.stages) {
+    if (!stage.studentAction?.trim()) issues.push(`${stage.id} 缺少学生行动`);
+    if (!stage.goalIds?.length || stage.goalIds.some((id) => !goalIds.has(id))) issues.push(`${stage.id} 未关联有效目标`);
+  }
+  if (!outline.project?.title?.trim() || !outline.project?.drivingQuestion?.trim() || !outline.project?.deliverables?.length) issues.push('项目名称、问题或成果缺失');
+  return { passed: issues.length === 0, issues, checkedAt: new Date().toISOString() };
+}
+
+
+const projectAgent = {
+  id: 'project-agent',
+  name: '项目编排 Agent',
+  version: '0.1',
+  async run({ request, curriculum, model }) {
+    const outline = generateOutline(request, curriculum);
+    if (!model) return outline;
+    const response = await model.completeJson({
+      system: '你是C语言项目式学习系统中的项目编排Agent。为第二章“基本数据类型”设计一个真实可做的项目大纲。以学生项目任务串联知识，保留需求探究、制作与反馈修订。不能假称已获得受众反馈，不能要求键盘输入、数组、算术统计或文件读写。课程目标ID、活动ID、证据标准由系统提供，不可改变。只返回JSON对象，格式示例：{"title":"校园活动：可更新的信息卡","drivingQuestion":"怎样让参与者看到准确且容易更新的信息？","fieldSuggestion":"地点、日期、名额","stageActions":{"A2.1":"学生行动...","A2.2":"学生行动...","A2.3":"学生行动..."}}。三项stageActions必须是具体学生行动，包含可呈现成果或反馈修订。',
+      user: JSON.stringify({
+        request,
+        chapter: curriculum.chapter,
+        goals: curriculum.goals.map((goal) => ({ id: goal.id, title: goal.title, scope: goal.scope_note })),
+        activities: curriculum.activities.map((activity) => ({ id: activity.id, title: activity.name, artifacts: activity.artifacts, goalIds: activity.goal_ids })),
+        projectConstraints: curriculum.project.constraints,
+      }),
+      maxTokens: 2600,
+    });
+    const draft = response.data;
+    const short = (value, max) => typeof value === 'string' && value.trim() && value.length <= max;
+    const stageIds = curriculum.activities.map((activity) => activity.id);
+    if (!short(draft.title, 120) || !short(draft.drivingQuestion, 300) || !short(draft.fieldSuggestion, 240) ||
+        !draft.stageActions || typeof draft.stageActions !== 'object' ||
+        stageIds.some((id) => !short(draft.stageActions[id], 800))) {
+      throw new Error('项目编排 Agent 输出不符合约定格式');
+    }
+    outline.project.title = draft.title.trim();
+    outline.project.drivingQuestion = draft.drivingQuestion.trim();
+    outline.project.fieldSuggestion = draft.fieldSuggestion.trim();
+    for (const stage of outline.stages) stage.studentAction = draft.stageActions[stage.id].trim();
+    if (outline.stages.some((stage) => /(scanf\s*\(|从键盘读取|使用数组|文件读写|写入文件|连接数据库)/i.test(stage.studentAction))) {
+      throw new Error('项目编排 Agent 生成了超出第二章范围的必做活动');
+    }
+    outline.modelUsage = response.usage;
+    return outline;
+  },
+};
+
+
+const iso = () => new Date().toISOString();
+
+async function runOutlineWorkflow(request, curriculum, { model = null } = {}) {
+  const trace = [];
+  async function invoke(agent, input) {
+    const startedAt = iso();
+    const start = Date.now();
+    try {
+      const output = await agent.run(input);
+      trace.push({ component: agent.id, name: agent.name, kind: 'agent', status: 'completed', startedAt, durationMs: Date.now() - start, usage: output.modelUsage ?? null });
+      return output;
+    } catch (error) {
+      trace.push({ component: agent.id, name: agent.name, kind: 'agent', status: 'failed', startedAt, durationMs: Date.now() - start, error: error.message });
+      throw error;
+    }
+  }
+
+  const normalizedRequest = cleanInput(request);
+  trace.push({ component: 'input-normalizer', name: '需求输入整理', kind: 'tool', status: 'completed', checkedAt: iso() });
+  const outline = await invoke(projectAgent, { request: normalizedRequest, curriculum, model });
+  const validation = validateOutline(outline, curriculum);
+  trace.push({ component: 'alignment-validator', name: '目标—活动—证据校验器', kind: 'tool', status: validation.passed ? 'completed' : 'needs_revision', checkedAt: validation.checkedAt });
+  outline.validation = validation;
+  outline.workflow = {
+    mode: model ? 'deepseek' : 'offline-simulation',
+    description: model ? '项目编排 Agent 调用 DeepSeek 生成项目大纲；需求输入整理与目标—活动—证据校验由确定性工具完成。' : '当前由本地规则生成静态大纲；需求输入整理与目标—活动—证据校验由确定性工具完成，未调用模型。',
+    trace,
+  };
+  return outline;
+}
+
+
+const STATIC_CURRICULUM = {"source":"第1至2章_教学对齐图谱_v1.1.json","sourceStatus":"待教师审核","textbookAlignment":"对应目录2.1—2.5；2.6扩充及常见错误的具体范围待正文核对","chapter":{"id":"CH02","name":"基本数据类型"},"project":{"id":"PRJ-INFOCARD","chapter_id":"CH02","name":"让同学看懂活动信息：可更新的信息卡","driving_question":"怎样准确表示受众关心的活动信息，并在需求变化时可靠更新？","umbrella":"校园欢迎与活动信息服务","artifact_version":"v0.2 变量化信息展示","audience":"实际活动负责人及参与者；可沿用第1章受众，或记录重新确认的需求","activity_ids":["A2.1","A2.2","A2.3"],"deliverables":["信息卡源文件与运行结果","数据设计说明","赋值更新对比","真实反馈与修订回应"],"constraints":["通过代码赋值更新，不要求键盘输入","活动名和说明可用固定文本，不引入字符数组","sizeof观察放开发说明，不强塞给受众"],"linkage":"默认在第一章程序上增量扩展；允许按学生需求替换项目主题并保持相同目标覆盖"},"goals":[{"id":"LO2.1","chapter_id":"CH02","title":"区分字面常量与变量并正确声明、初始化和使用变量","knowledge_ids":["KN-C-LITERALS","K2.2.1.1","K2.2.1.2","K2.2.2.4"],"capability_ids":["C1.2.1","C4.1.1"],"activity_ids":["A2.1","A2.2","A2.3"],"evidence_id":"E2.1","success_criteria":["能指出自己代码中的字面常量与变量，说明两者差别","变量声明、初始化与使用符合本项目要求，不把现实中暂时不变的数据等同于语言常量"],"independent_evidence_required":true,"scope_note":"本章只用字面常量；#define 与 const 不作为验收要求","status":"设计草案_待教师审核"},{"id":"LO2.2","chapter_id":"CH02","title":"按数据含义选择基本类型并进行简单输出","knowledge_ids":["K2.2.2.1","K2.2.2.2","K2.2.2.3","K2.4.1.1"],"capability_ids":["C2.1.1","C1.1.1","C6.4.1"],"activity_ids":["A2.1","A2.2","A2.3"],"evidence_id":"E2.2","success_criteria":["为真实字段选择合适的整数、浮点或字符表示并解释理由；无需强行让产品包含所有类型","使用需要的基本输出形式，结果和单位清楚，格式符与实参匹配","能独立处理一个相关字段变化；必要时用很短的补充情境覆盖未出现的基本类型"],"independent_evidence_required":true,"scope_note":"int/char/float/double 为示例；详细编码、浮点误差机制及复杂格式控制不作本章核心验收","status":"设计草案_待教师审核"},{"id":"LO2.3","chapter_id":"CH02","title":"理解赋值并跟踪变量值的变化","knowledge_ids":["K2.2.2.4"],"capability_ids":["C1.2.2","C4.1.1","C5.1.2"],"activity_ids":["A2.2","A2.3"],"evidence_id":"E2.3","success_criteria":["能预测顺序执行的简单赋值前后变量值和输出","能独立按受众调整要求修改赋值并核对结果，区分赋值与数学相等"],"independent_evidence_required":true,"scope_note":"代码中修改赋值，不要求键盘输入、算术统计、复合赋值或条件循环","status":"设计草案_待教师审核"},{"id":"LO2.4","chapter_id":"CH02","title":"使用 sizeof 观察并解释类型或变量的存储空间","knowledge_ids":["K2.2.2.6"],"capability_ids":["C6.2.2","C6.4.1"],"activity_ids":["A2.2","A2.3"],"evidence_id":"E2.4","success_criteria":["能在给定环境中使用 sizeof 并解释返回的是以 C 字节为单位的大小","能区分存储大小、保存的数值与输出字符数量；观察同类型不同数值的大小","不把某环境测得的 int 大小当成所有环境固定值"],"independent_evidence_required":true,"scope_note":"作为嵌入式探究和设计说明，无需展示给最终受众；printf 的 %zu 可提供即时用法提示，不考查 size_t 深层机制","status":"设计草案_待教师审核"}],"activities":[{"id":"A2.1","chapter_id":"CH02","name":"确定信息卡字段和数据需求","student_task":"在第一章欢迎程序上扩展校园活动信息卡；与实际活动负责人或参与者确认字段、单位和需要更新的数据。","artifacts":["需求变化记录","字段及样例值草稿"],"learner_choices":["活动主题、字段、展示顺序"],"activation":"章节核心活动","phase":"需求与方案","goal_ids":["LO2.1","LO2.2"]},{"id":"A2.2","chapter_id":"CH02","name":"用变量制作可更新的信息卡","student_task":"定义、初始化和输出字段，预测赋值更新结果并运行核对；在开发说明中进行短暂的 sizeof 观察。","artifacts":["程序和运行结果","类型选择理由","赋值预测与验证","存储空间观察说明"],"learner_choices":["变量命名、类型选择、排版、探究表达形式"],"activation":"章节核心活动","phase":"制作与探究","goal_ids":["LO2.1","LO2.2","LO2.3","LO2.4"]},{"id":"A2.3","chapter_id":"CH02","name":"真实试用与数据更新","student_task":"收集真实受众反馈，通过修改代码赋值更新信息并修订呈现；解释数据设计，缺少独立表现时进行短任务补证。","artifacts":["受众反馈","版本差异","更新验证","个人解释与独立应用证据"],"learner_choices":["反馈优先级、修订方案、讲解方式"],"activation":"章节核心活动","phase":"反馈与改进","goal_ids":["LO2.1","LO2.2","LO2.3","LO2.4"]}],"evidence":[{"id":"E2.1","goal_ids":["LO2.1"],"acceptable_forms":["版本关联的代码/运行记录","口述转写或文字解释","展示答问","小型独立修改或观察记录"],"criteria":["能指出自己代码中的字面常量与变量，说明两者差别","变量声明、初始化与使用符合本项目要求，不把现实中暂时不变的数据等同于语言常量"],"required_support_context":true,"independent_evidence_required":true,"acquisition":"优先复用自然活动证据；缺失、矛盾或无法区分个人理解时才触发补充检查","insufficiency":["仅复制代码并运行成功","没有说明证据对应的代码版本或情境","用完整答案完成却标记为独立完成"],"may_share_artifact_with_other_goals":true,"assessment_statuses":["未采集","待评价","证据不足","支持下表现达成","独立表现达成","存在矛盾"],"status_note":"状态表示当前证据判断，不是永久掌握标签；未采集不等于不会"},{"id":"E2.2","goal_ids":["LO2.2"],"acceptable_forms":["版本关联的代码/运行记录","口述转写或文字解释","展示答问","小型独立修改或观察记录"],"criteria":["为真实字段选择合适的整数、浮点或字符表示并解释理由；无需强行让产品包含所有类型","使用需要的基本输出形式，结果和单位清楚，格式符与实参匹配","能独立处理一个相关字段变化；必要时用很短的补充情境覆盖未出现的基本类型"],"required_support_context":true,"independent_evidence_required":true,"acquisition":"优先复用自然活动证据；缺失、矛盾或无法区分个人理解时才触发补充检查","insufficiency":["仅复制代码并运行成功","没有说明证据对应的代码版本或情境","用完整答案完成却标记为独立完成"],"may_share_artifact_with_other_goals":true,"assessment_statuses":["未采集","待评价","证据不足","支持下表现达成","独立表现达成","存在矛盾"],"status_note":"状态表示当前证据判断，不是永久掌握标签；未采集不等于不会"},{"id":"E2.3","goal_ids":["LO2.3"],"acceptable_forms":["版本关联的代码/运行记录","口述转写或文字解释","展示答问","小型独立修改或观察记录"],"criteria":["能预测顺序执行的简单赋值前后变量值和输出","能独立按受众调整要求修改赋值并核对结果，区分赋值与数学相等"],"required_support_context":true,"independent_evidence_required":true,"acquisition":"优先复用自然活动证据；缺失、矛盾或无法区分个人理解时才触发补充检查","insufficiency":["仅复制代码并运行成功","没有说明证据对应的代码版本或情境","用完整答案完成却标记为独立完成"],"may_share_artifact_with_other_goals":true,"assessment_statuses":["未采集","待评价","证据不足","支持下表现达成","独立表现达成","存在矛盾"],"status_note":"状态表示当前证据判断，不是永久掌握标签；未采集不等于不会"},{"id":"E2.4","goal_ids":["LO2.4"],"acceptable_forms":["版本关联的代码/运行记录","口述转写或文字解释","展示答问","小型独立修改或观察记录"],"criteria":["能在给定环境中使用 sizeof 并解释返回的是以 C 字节为单位的大小","能区分存储大小、保存的数值与输出字符数量；观察同类型不同数值的大小","不把某环境测得的 int 大小当成所有环境固定值"],"required_support_context":true,"independent_evidence_required":true,"acquisition":"优先复用自然活动证据；缺失、矛盾或无法区分个人理解时才触发补充检查","insufficiency":["仅复制代码并运行成功","没有说明证据对应的代码版本或情境","用完整答案完成却标记为独立完成"],"may_share_artifact_with_other_goals":true,"assessment_statuses":["未采集","待评价","证据不足","支持下表现达成","独立表现达成","存在矛盾"],"status_note":"状态表示当前证据判断，不是永久掌握标签；未采集不等于不会"}]};
+window.OUTLINE_API = {
+  generate: (request) => runOutlineWorkflow(request, STATIC_CURRICULUM),
+  validate: (data) => validateOutline(data, STATIC_CURRICULUM),
+};
+
+const form = document.getElementById('requestForm');
+const result = document.getElementById('result');
+const generateButton = document.getElementById('generateButton');
+let outline = null;
+
+async function requestGenerate(request) {
+  if (window.OUTLINE_API) return window.OUTLINE_API.generate(request);
+  const response = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(request) });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || '生成失败');
+  return data;
+}
+
+async function requestValidate(data) {
+  if (window.OUTLINE_API) return window.OUTLINE_API.validate(data);
+  const response = await fetch('/api/validate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ outline: data }) });
+  const checked = await response.json();
+  if (!response.ok) throw new Error(checked.error || '校验失败');
+  return checked;
+}
+
+const el = (tag, text, className) => {
+  const node = document.createElement(tag);
+  if (text != null) node.textContent = String(text);
+  if (className) node.className = className;
+  return node;
+};
+const add = (parent, ...children) => children.forEach((child) => parent.append(child));
+const list = (items) => {
+  const ul = el('ul', null, 'list');
+  items.forEach((item) => add(ul, el('li', item)));
+  return ul;
+};
+const section = (title) => {
+  const node = el('section');
+  add(node, el('h3', title));
+  return node;
+};
+function editable(parent, label, value, change, multi = false) {
+  const wrap = el('div', null, 'editable');
+  const control = el(multi ? 'textarea' : 'input');
+  control.value = value;
+  if (multi) control.rows = 3;
+  control.addEventListener('input', () => { change(control.value); markDirty(); });
+  add(wrap, el('label', label), control);
+  add(parent, wrap);
+}
+function markDirty() {
+  const state = document.getElementById('checkState');
+  if (state) { state.textContent = '已修改，请重新校验'; state.className = 'status'; }
+}
+function download(name, content, mime) {
+  const url = URL.createObjectURL(new Blob([content], { type: mime }));
+  const link = el('a');
+  link.href = url;
+  link.download = name;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+const mdCell = (value) => String(value).replaceAll('|', '｜').replaceAll('\n', ' ');
+function asMarkdown(data) {
+  const lines = [
+    `# ${data.project.title}`, '',
+    `章节：${data.chapter.name}`, `需求：${data.request.need}`, `使用者：${data.project.audience}`, '',
+    `**驱动问题：**${data.project.drivingQuestion}`, '',
+    '## 阶段任务', '',
+  ];
+  data.stages.forEach((stage) => lines.push(`### ${stage.id} ${stage.title}`, '', stage.studentAction, '', `阶段成果：${stage.artifacts.join('；')}`, `关联目标：${stage.goalIds.join('、')}`, ''));
+  lines.push('## 目标—活动—证据对齐', '', '| 学习目标 | 活动 | 计划收集的证据 | 判断标准 |', '| --- | --- | --- | --- |');
+  data.alignment.forEach((row) => lines.push(`| ${mdCell(`${row.goalId} ${row.goal}`)} | ${mdCell(row.activityIds.join('、'))} | ${mdCell(row.evidencePlan.join('；'))} | ${mdCell(row.criteria.join('；'))} |`));
+  lines.push('', '## 本章边界', '', ...data.project.constraints.map((item) => `- ${item}`), '', `> ${data.note}`);
+  if (data.warnings.length) lines.push('', '## 待后续章节处理', '', ...data.warnings.map((item) => `- ${item}`));
+  return `${lines.join('\n')}\n`;
+}
+function render() {
+  result.replaceChildren(el('h2', '第二章项目大纲'));
+  const meta = el('div', null, 'meta');
+  add(meta, el('span', 'CH02 基本数据类型', 'chip'), el('span', outline.sourceStatus, 'chip'), el('span', outline.workflow?.mode === 'deepseek' ? 'DeepSeek 项目编排' : '离线流程样例', 'chip'));
+  add(result, meta);
+  if (outline.workflow?.trace) {
+    const workflow = el('details');
+    add(workflow, el('summary', '查看组件调用记录'));
+    add(workflow, list(outline.workflow.trace.map((step) => `${step.name}（${step.kind === 'agent' ? 'Agent' : '工具'}）：${step.status}`)));
+    add(workflow, el('p', outline.workflow.description, 'small'));
+    add(result, workflow);
+  }
+  const top = section('项目概述');
+  editable(top, '项目名称', outline.project.title, (value) => outline.project.title = value);
+  editable(top, '驱动问题', outline.project.drivingQuestion, (value) => outline.project.drivingQuestion = value, true);
+  add(top, el('p', `受众：${outline.project.audience}`), el('p', `建议字段：${outline.project.fieldSuggestion}`), el('p', `成果：${outline.project.deliverables.join('；')}`));
+  add(result, top);
+
+  const stages = section('项目活动与阶段成果');
+  outline.stages.forEach((stage) => {
+    const card = el('div', null, 'stage');
+    add(card, el('strong', `${stage.id} ${stage.title}`));
+    editable(card, '学生行动', stage.studentAction, (value) => stage.studentAction = value, true);
+    add(card, el('p', `阶段成果：${stage.artifacts.join('；')}`), el('p', `关联目标：${stage.goalIds.join('、')}`, 'small'));
+    add(stages, card);
+  });
+  add(result, stages);
+
+  const alignment = section('目标—活动—证据');
+  const wrap = el('div', null, 'table-wrap');
+  const table = el('table');
+  const head = el('tr');
+  ['学习目标', '关联活动', '计划收集的证据', '判断标准'].forEach((name) => add(head, el('th', name)));
+  const thead = el('thead'); add(thead, head); add(table, thead);
+  const tbody = el('tbody');
+  outline.alignment.forEach((row) => {
+    const tr = el('tr');
+    add(tr, el('td', `${row.goalId} ${row.goal}`), el('td', row.activityIds.join('、')));
+    const evidence = el('td');
+    editable(evidence, '证据形式（每行一项）', row.evidencePlan.join('\n'), (value) => row.evidencePlan = value.split('\n').map((v) => v.trim()).filter(Boolean), true);
+    const criteria = el('td');
+    editable(criteria, '判断标准（每行一项）', row.criteria.join('\n'), (value) => row.criteria = value.split('\n').map((v) => v.trim()).filter(Boolean), true);
+    add(tr, evidence, criteria); add(tbody, tr);
+  });
+  add(table, tbody); add(wrap, table); add(alignment, wrap); add(result, alignment);
+
+  const boundary = section('教学边界与检查');
+  add(boundary, list(outline.project.constraints));
+  if (outline.warnings.length) {
+    const warning = el('div', null, 'callout warning');
+    add(warning, el('strong', '需求中涉及后续章节内容'), list(outline.warnings));
+    add(boundary, warning);
+  }
+  const check = el('p', outline.validation.passed ? '对齐检查通过：4个目标均有活动、证据及判断标准。' : `对齐检查未通过：${outline.validation.issues.join('；')}`, `status ${outline.validation.passed ? 'pass' : 'fail'}`);
+  check.id = 'checkState'; add(boundary, check, el('p', outline.note, 'small'));
+  const toolbar = el('div', null, 'toolbar');
+  const verify = el('button', '重新校验', 'secondary'); verify.type = 'button';
+  verify.addEventListener('click', async () => {
+    try {
+      const data = await requestValidate(outline);
+      outline.validation = data;
+      check.textContent = data.passed ? '对齐检查通过：4个目标均有活动、证据及判断标准。' : `对齐检查未通过：${data.issues.join('；')}`;
+      check.className = `status ${data.passed ? 'pass' : 'fail'}`;
+    } catch (error) { check.textContent = error.message; check.className = 'status fail'; }
+  });
+  const json = el('button', '保存 JSON', 'secondary'); json.type = 'button';
+  json.addEventListener('click', () => download('C语言第二章项目大纲.json', `${JSON.stringify(outline, null, 2)}\n`, 'application/json;charset=utf-8'));
+  const markdown = el('button', '导出 Markdown', 'secondary'); markdown.type = 'button';
+  markdown.addEventListener('click', () => download('C语言第二章项目大纲.md', asMarkdown(outline), 'text/markdown;charset=utf-8'));
+  add(toolbar, verify, json, markdown); add(boundary, toolbar); add(result, boundary);
+}
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  generateButton.disabled = true;
+  result.replaceChildren(el('p', '正在生成第二章项目大纲……'));
+  try {
+    const request = Object.fromEntries(new FormData(form));
+    outline = await requestGenerate(request);
+    render();
+  } catch (error) { result.replaceChildren(el('p', error.message, 'fail')); }
+  finally { generateButton.disabled = false; }
+});
+
+</script>
+</body>
+</html>

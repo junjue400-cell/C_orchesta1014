@@ -1,0 +1,254 @@
+{
+  "schemaVersion": "0.1",
+  "sourceStatus": "待教师审核",
+  "chapter": {
+    "id": "CH02",
+    "name": "基本数据类型"
+  },
+  "request": {
+    "theme": "校园活动",
+    "audience": "活动参与者",
+    "fields": "活动日期、地点、人数",
+    "need": "活动时间和地点经常变化，希望信息卡更容易更新。",
+    "limit": ""
+  },
+  "project": {
+    "title": "校园活动：可更新的信息卡",
+    "drivingQuestion": "怎样用 C 语言准确表示活动参与者关心的校园活动信息，并在需求变化时可靠更新？",
+    "audience": "活动参与者",
+    "fieldSuggestion": "活动日期、地点、人数",
+    "version": "v0.2 变量化信息展示",
+    "deliverables": [
+      "信息卡源文件与运行结果",
+      "数据设计说明",
+      "赋值更新对比",
+      "真实反馈与修订回应"
+    ],
+    "constraints": [
+      "通过代码赋值更新，不要求键盘输入",
+      "活动名和说明可用固定文本，不引入字符数组",
+      "sizeof观察放开发说明，不强塞给受众"
+    ],
+    "continuation": "可作为第一章欢迎程序的下一版本，也可从同等起点开始。"
+  },
+  "stages": [
+    {
+      "id": "A2.1",
+      "title": "确定信息卡字段和数据需求",
+      "studentAction": "围绕“活动时间和地点经常变化，希望信息卡更容易更新。”与活动参与者确认校园活动信息卡需要呈现的字段、单位和可能变化的数据；形成字段草稿，并区分固定说明与需要更新的值。",
+      "goalIds": [
+        "LO2.1",
+        "LO2.2"
+      ],
+      "artifacts": [
+        "需求变化记录",
+        "字段及样例值草稿"
+      ],
+      "choices": [
+        "活动主题、字段、展示顺序"
+      ]
+    },
+    {
+      "id": "A2.2",
+      "title": "用变量制作可更新的信息卡",
+      "studentAction": "在已有欢迎程序上增加校园活动信息卡：为必要数据选择基本类型，声明并初始化变量，输出字段与单位；通过修改代码中的赋值更新信息，预测并核对结果；用 sizeof 做简短的存储空间观察。",
+      "goalIds": [
+        "LO2.1",
+        "LO2.2",
+        "LO2.3",
+        "LO2.4"
+      ],
+      "artifacts": [
+        "程序和运行结果",
+        "类型选择理由",
+        "赋值预测与验证",
+        "存储空间观察说明"
+      ],
+      "choices": [
+        "变量命名、类型选择、排版、探究表达形式"
+      ]
+    },
+    {
+      "id": "A2.3",
+      "title": "真实试用与数据更新",
+      "studentAction": "向活动参与者展示可运行的信息卡，记录实际反馈，修改代码中的值或呈现方式并复测；说明类型选择和赋值变化，必要时完成一个未直接示范的小型独立修改。",
+      "goalIds": [
+        "LO2.1",
+        "LO2.2",
+        "LO2.3",
+        "LO2.4"
+      ],
+      "artifacts": [
+        "受众反馈",
+        "版本差异",
+        "更新验证",
+        "个人解释与独立应用证据"
+      ],
+      "choices": [
+        "反馈优先级、修订方案、讲解方式"
+      ]
+    }
+  ],
+  "alignment": [
+    {
+      "goalId": "LO2.1",
+      "goal": "区分字面常量与变量并正确声明、初始化和使用变量",
+      "knowledgeIds": [
+        "KN-C-LITERALS",
+        "K2.2.1.1",
+        "K2.2.1.2",
+        "K2.2.2.4"
+      ],
+      "capabilityIds": [
+        "C1.2.1",
+        "C4.1.1"
+      ],
+      "activityIds": [
+        "A2.1",
+        "A2.2",
+        "A2.3"
+      ],
+      "evidenceId": "E2.1",
+      "evidencePlan": [
+        "版本关联的代码/运行记录",
+        "口述转写或文字解释",
+        "展示答问",
+        "小型独立修改或观察记录"
+      ],
+      "criteria": [
+        "能指出自己代码中的字面常量与变量，说明两者差别",
+        "变量声明、初始化与使用符合本项目要求，不把现实中暂时不变的数据等同于语言常量"
+      ],
+      "independentRequired": true,
+      "scopeNote": "本章只用字面常量；#define 与 const 不作为验收要求"
+    },
+    {
+      "goalId": "LO2.2",
+      "goal": "按数据含义选择基本类型并进行简单输出",
+      "knowledgeIds": [
+        "K2.2.2.1",
+        "K2.2.2.2",
+        "K2.2.2.3",
+        "K2.4.1.1"
+      ],
+      "capabilityIds": [
+        "C2.1.1",
+        "C1.1.1",
+        "C6.4.1"
+      ],
+      "activityIds": [
+        "A2.1",
+        "A2.2",
+        "A2.3"
+      ],
+      "evidenceId": "E2.2",
+      "evidencePlan": [
+        "版本关联的代码/运行记录",
+        "口述转写或文字解释",
+        "展示答问",
+        "小型独立修改或观察记录"
+      ],
+      "criteria": [
+        "为真实字段选择合适的整数、浮点或字符表示并解释理由；无需强行让产品包含所有类型",
+        "使用需要的基本输出形式，结果和单位清楚，格式符与实参匹配",
+        "能独立处理一个相关字段变化；必要时用很短的补充情境覆盖未出现的基本类型"
+      ],
+      "independentRequired": true,
+      "scopeNote": "int/char/float/double 为示例；详细编码、浮点误差机制及复杂格式控制不作本章核心验收"
+    },
+    {
+      "goalId": "LO2.3",
+      "goal": "理解赋值并跟踪变量值的变化",
+      "knowledgeIds": [
+        "K2.2.2.4"
+      ],
+      "capabilityIds": [
+        "C1.2.2",
+        "C4.1.1",
+        "C5.1.2"
+      ],
+      "activityIds": [
+        "A2.2",
+        "A2.3"
+      ],
+      "evidenceId": "E2.3",
+      "evidencePlan": [
+        "版本关联的代码/运行记录",
+        "口述转写或文字解释",
+        "展示答问",
+        "小型独立修改或观察记录"
+      ],
+      "criteria": [
+        "能预测顺序执行的简单赋值前后变量值和输出",
+        "能独立按受众调整要求修改赋值并核对结果，区分赋值与数学相等"
+      ],
+      "independentRequired": true,
+      "scopeNote": "代码中修改赋值，不要求键盘输入、算术统计、复合赋值或条件循环"
+    },
+    {
+      "goalId": "LO2.4",
+      "goal": "使用 sizeof 观察并解释类型或变量的存储空间",
+      "knowledgeIds": [
+        "K2.2.2.6"
+      ],
+      "capabilityIds": [
+        "C6.2.2",
+        "C6.4.1"
+      ],
+      "activityIds": [
+        "A2.2",
+        "A2.3"
+      ],
+      "evidenceId": "E2.4",
+      "evidencePlan": [
+        "版本关联的代码/运行记录",
+        "口述转写或文字解释",
+        "展示答问",
+        "小型独立修改或观察记录"
+      ],
+      "criteria": [
+        "能在给定环境中使用 sizeof 并解释返回的是以 C 字节为单位的大小",
+        "能区分存储大小、保存的数值与输出字符数量；观察同类型不同数值的大小",
+        "不把某环境测得的 int 大小当成所有环境固定值"
+      ],
+      "independentRequired": true,
+      "scopeNote": "作为嵌入式探究和设计说明，无需展示给最终受众；printf 的 %zu 可提供即时用法提示，不考查 size_t 深层机制"
+    }
+  ],
+  "warnings": [],
+  "note": "这是预设的学习机会与证据获取计划，并非已经收集到的学生表现或掌握结论。",
+  "validation": {
+    "passed": true,
+    "issues": [],
+    "checkedAt": "2026-10-13T13:06:49.727Z"
+  },
+  "workflow": {
+    "mode": "offline-simulation",
+    "description": "当前由本地规则生成静态大纲；需求输入整理与目标—活动—证据校验由确定性工具完成，未调用模型。",
+    "trace": [
+      {
+        "component": "input-normalizer",
+        "name": "需求输入整理",
+        "kind": "tool",
+        "status": "completed",
+        "checkedAt": "2026-10-13T13:06:49.724Z"
+      },
+      {
+        "component": "project-agent",
+        "name": "项目编排 Agent",
+        "kind": "agent",
+        "status": "completed",
+        "startedAt": "2026-10-13T13:06:49.726Z",
+        "durationMs": 1,
+        "usage": null
+      },
+      {
+        "component": "alignment-validator",
+        "name": "目标—活动—证据校验器",
+        "kind": "tool",
+        "status": "completed",
+        "checkedAt": "2026-10-13T13:06:49.727Z"
+      }
+    ]
+  }
+}

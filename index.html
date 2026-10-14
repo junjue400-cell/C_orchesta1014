@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>C语言第二章项目式学习大纲原型</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <p class="eyebrow">《C语言程序设计》 · 第二章：基本数据类型</p>
+      <h1>项目式学习大纲生成</h1>
+      <p>填写项目需求，生成阶段任务与“目标—活动—证据”对应表。可直接修改结果，重新校验后保存。</p>
+    </header>
+    <section class="layout" aria-label="大纲生成区">
+      <form id="requestForm" class="panel form-panel">
+        <h2>学生需求</h2>
+        <label>项目主题 <input name="theme" maxlength="80" required value="校园活动" placeholder="例如：社团招新"></label>
+        <label>信息使用者 <input name="audience" maxlength="80" required value="活动参与者" placeholder="例如：新生"></label>
+        <label>想解决的问题 <textarea name="need" maxlength="400" required rows="3">活动时间和地点经常变化，希望信息卡更容易更新。</textarea></label>
+        <label>希望呈现的字段 <input name="fields" maxlength="240" value="活动日期、地点、人数" placeholder="如：日期、地点、名额"></label>
+        <label>其他限制 <textarea name="limit" maxlength="200" rows="2" placeholder="可留空"></textarea></label>
+        <p class="hint">本章通过修改代码中的赋值更新数据；键盘输入、数组和文件保存属于后续章节。</p>
+        <button type="submit" id="generateButton">生成第二章大纲</button>
+      </form>
+      <div id="result" class="panel result-panel" aria-live="polite">
+        <h2>等待生成</h2>
+        <p>右侧会显示项目任务、阶段成果与对齐检查。</p>
+      </div>
+    </section>
+    <footer>本原型读取第二章图谱修订草案。生成的是学习与证据计划，尚未评价真实学生的掌握情况。</footer>
+  </main>
+</body>
+</html>
